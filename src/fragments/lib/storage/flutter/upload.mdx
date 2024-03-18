@@ -1,6 +1,6 @@
 ## Upload File
 
-To upload to S3 from a file, specify the `key` and the `localFile` to be uploaded, where the `localFile` can be an instance of `AWSFile` created from either an OS platform `File` instance or the result of Flutter file picker plugins such as [file_picker](https://pub.dev/packages/file_picker).
+To upload to S3 from a file, specify the `path` and the `localFile` to be uploaded, where the `localFile` can be an instance of `AWSFile` created from either an OS platform `File` instance or the result of Flutter file picker plugins such as [file_picker](https://pub.dev/packages/file_picker).
 
 ### Upload platform `File`
 
@@ -26,9 +26,9 @@ Future<void> uploadIOFile(io.File file) async {
   try {
     final uploadResult = await Amplify.Storage.uploadFile(
       localFile: awsFile,
-      key: 'upload/file.png',
+      path: 'upload/file.png',
     ).result;
-    safePrint('Uploaded file: ${uploadResult.uploadedItem.key}');
+    safePrint('Uploaded file: ${uploadResult.uploadedItem.path}');
   } on StorageException catch (e) {
     safePrint('Error uploading file: ${e.message}');
     rethrow;
@@ -51,9 +51,9 @@ Future<void> uploadHtmlFile(html.File file) async {
   try {
     final uploadResult = await Amplify.Storage.uploadFile(
       localFile: awsFile,
-      key: 'upload/file.png',
+      path: 'upload/file.png',
     ).result;
-    safePrint('Uploaded file: ${uploadResult.uploadedItem.key}');
+    safePrint('Uploaded file: ${uploadResult.uploadedItem.path}');
   } on StorageException catch (e) {
     safePrint('Error uploading file: ${e.message}');
     rethrow;
@@ -64,6 +64,19 @@ Future<void> uploadHtmlFile(html.File file) async {
 </Block>
 
 </BlockSwitcher>
+
+### Upload File with Path
+
+```dart
+import 'package:amplify_flutter/amplify_flutter.dart';
+
+Future<void> uploadFileWithPath(localFile file, String path) async {
+  final result = await Amplify.Storage.uploadFile(
+    localFile: file,
+    path: (id) => 'protected/$id/picture.png',
+  ).result;
+}
+```
 
 ### Upload with Flutter file_picker plugin
 
@@ -96,12 +109,12 @@ Future<void> uploadImage() async {
         platformFile.readStream!,
         size: platformFile.size,
       ),
-      key: platformFile.name,
+      path: (id) => 'protected/$id/${platformFile.name}',
       onProgress: (progress) {
         safePrint('Fraction completed: ${progress.fractionCompleted}');
       },
     ).result;
-    safePrint('Successfully uploaded file: ${result.uploadedItem.key}');
+    safePrint('Successfully uploaded file: ${result.uploadedItem.path}');
   } on StorageException catch (e) {
     safePrint('Error uploading file: $e');
     rethrow;
@@ -111,7 +124,7 @@ Future<void> uploadImage() async {
 
 ## Upload Data
 
-To upload to S3 from a data object, specify the `key` and `data`, where `data` is an instance of `S3DataPayload` created from various data formats.
+To upload to S3 from a data object, specify the `path` and `data`, where `data` is an instance of `S3DataPayload` created from various data formats.
 
 <BlockSwitcher>
 
@@ -123,7 +136,7 @@ import 'package:amplify_storage_s3/amplify_storage_s3.dart';
 
 Future<void> uploadStringData({
   required String dataString,
-  required String key,
+  required String path,
 }) async {
   try {
     final result = await Amplify.Storage.uploadData(
@@ -131,10 +144,10 @@ Future<void> uploadStringData({
         dataString,
         contentType: 'text/plain',
       ),
-      key: key,
+      path: path,
     ).result;
 
-    safePrint('Uploaded data: ${result.uploadedItem.key}');
+    safePrint('Uploaded data: ${result.uploadedItem.path}');
   } on StorageException catch (e) {
     safePrint('Error uploading data: ${e.message}');
     rethrow;
@@ -152,15 +165,15 @@ import 'package:amplify_storage_s3/amplify_storage_s3.dart';
 
 Future<void> uploadJsonObject({
   required Map<String, Object?> json,
-  required String key,
+  required String path,
 }) async {
   try {
     final result = await Amplify.Storage.uploadData(
       data: S3DataPayload.json(json),
-      key: key,
+      path: path,
     ).result;
 
-    safePrint('Uploaded data: ${result.uploadedItem.key}');
+    safePrint('Uploaded data: ${result.uploadedItem.path}');
   } on StorageException catch (e) {
     safePrint('Error uploading data: ${e.message}');
     rethrow;
@@ -180,15 +193,15 @@ import 'package:amplify_storage_s3/amplify_storage_s3.dart';
 
 Future<void> uploadDataUrl({
   required String dataUrl,
-  required String key,
+  required String path,
 }) async {
   try {
     final result = await Amplify.Storage.uploadData(
       data: S3DataPayload.dataUrl(dataUrl),
-      key: key,
+      path: path,
     ).result;
 
-    safePrint('Uploaded data: ${result.uploadedItem.key}');
+    safePrint('Uploaded data: ${result.uploadedItem.path}');
   } on StorageException catch (e) {
     safePrint('Error uploading data: ${e.message}');
     rethrow;
@@ -206,7 +219,7 @@ import 'package:amplify_storage_s3/amplify_storage_s3.dart';
 
 Future<void> uploadBytes({
   required List<int> bytes,
-  required String key,
+  required String path,
   required String contentType,
 }) async {
   try {
@@ -215,10 +228,10 @@ Future<void> uploadBytes({
         bytes,
         contentType: contentType,
       ),
-      key: key,
+      path: path,
     ).result;
 
-    safePrint('Uploaded data: ${result.uploadedItem.key}');
+    safePrint('Uploaded data: ${result.uploadedItem.path}');
   } on StorageException catch (e) {
     safePrint('Error uploading data: ${e.message}');
     rethrow;
@@ -242,7 +255,7 @@ Future<void> uploadWithOptions() async {
       'example',
       contentType: 'text/plain',
     ),
-    key: 'example.txt',
+    path: 'public/example.txt',
     options: const StorageUploadDataOptions(
       metadata: {
         'project': 'ExampleProject',
@@ -260,7 +273,7 @@ Future<void> uploadWithOptions() async {
   // When uploading a file, use `StorageUploadFileOptions`
   final uploadFileOperation = Amplify.Storage.uploadFile(
     localFile: AWSFile.fromPath('path/to/example.txt'),
-    key: 'example.txt',
+    path: 'public/example.txt',
     options: const StorageUploadFileOptions(
       metadata: {
         'project': 'ExampleProject',
@@ -302,11 +315,11 @@ Future<void> uploadFile(String path) async {
     final storagePlugin = Amplify.Storage.getPlugin(AmplifyStorageS3.pluginKey);
     uploadOperation = storagePlugin.uploadFile(
       localFile: AWSFile.fromPath(path),
-      key: 'example_file.txt',
+      path: 'public/example_file.txt',
     );
 
     final result = await uploadOperation!.result;
-    safePrint('Uploaded ${result.uploadedItem.key}');
+    safePrint('Uploaded ${result.uploadedItem.path}');
   } on StorageException catch (e) {
     safePrint('Error uploading file: ${e.message}');
   }

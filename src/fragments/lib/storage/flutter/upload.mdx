@@ -26,7 +26,7 @@ Future<void> uploadIOFile(io.File file) async {
   try {
     final uploadResult = await Amplify.Storage.uploadFile(
       localFile: awsFile,
-      path: 'upload/file.png',
+      path: StoragePath.fromString('upload/file.png'),
     ).result;
     safePrint('Uploaded file: ${uploadResult.uploadedItem.path}');
   } on StorageException catch (e) {
@@ -51,7 +51,7 @@ Future<void> uploadHtmlFile(html.File file) async {
   try {
     final uploadResult = await Amplify.Storage.uploadFile(
       localFile: awsFile,
-      path: 'upload/file.png',
+      path: StoragePath.fromString('upload/file.png'),
     ).result;
     safePrint('Uploaded file: ${uploadResult.uploadedItem.path}');
   } on StorageException catch (e) {
@@ -255,7 +255,7 @@ Future<void> uploadWithOptions() async {
       'example',
       contentType: 'text/plain',
     ),
-    path: 'public/example.txt',
+    path: StoragePath.fromString('public/example.txt'),
     options: const StorageUploadDataOptions(
       metadata: {
         'project': 'ExampleProject',
@@ -273,7 +273,7 @@ Future<void> uploadWithOptions() async {
   // When uploading a file, use `StorageUploadFileOptions`
   final uploadFileOperation = Amplify.Storage.uploadFile(
     localFile: AWSFile.fromPath('path/to/example.txt'),
-    path: 'public/example.txt',
+    path: StoragePath.fromString('public/example.txt'),
     options: const StorageUploadFileOptions(
       metadata: {
         'project': 'ExampleProject',
@@ -315,7 +315,7 @@ Future<void> uploadFile(String path) async {
     final storagePlugin = Amplify.Storage.getPlugin(AmplifyStorageS3.pluginKey);
     uploadOperation = storagePlugin.uploadFile(
       localFile: AWSFile.fromPath(path),
-      path: 'public/example_file.txt',
+      path: StoragePath.fromString('public/example.txt'),
     );
 
     final result = await uploadOperation!.result;

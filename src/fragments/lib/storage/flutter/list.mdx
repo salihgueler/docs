@@ -1,7 +1,6 @@
 You can list all files uploaded under a given path.
 
 This will list all files located under path `album` that:
-* have `private` access level
 * are in the root of `album/` (the result doesn't include files under any sub path)
 
 ```dart
@@ -14,9 +13,8 @@ Future<void> listAlbum() async {
     bool hasNextPage;
     do {
       final result = await Amplify.Storage.list(
-        path: 'album/',
+        path: StoragePath.fromIdentityId(id) => '/private/$id/album/',
         options: StorageListOptions(
-          accessLevel: StorageAccessLevel.private,
           pageSize: 50,
           nextToken: nextToken,
           pluginOptions: const S3ListPluginOptions(
@@ -39,7 +37,6 @@ Pagination is enabled by default. The default `pageSize` is `1000` if it is not 
 
 You can also list all files under a given path without pagination by using the `pluginOptions` and `S3ListPluginOptions.listAll()` constructor.
 
-This will list all public files (i.e. those with `guest` access level):
 
 ```dart
 import 'package:amplify_flutter/amplify_flutter.dart';
@@ -48,8 +45,8 @@ import 'package:amplify_storage_s3/amplify_storage_s3.dart';
 Future<void> listAllWithGuestAccessLevel() async {
   try {
     final result = await Amplify.Storage.list(
+      path: StoragePath.fromString('/public/'),
       options: const StorageListOptions(
-        accessLevel: StorageAccessLevel.guest,
         pluginOptions: S3ListPluginOptions.listAll(),
       ),
     ).result;

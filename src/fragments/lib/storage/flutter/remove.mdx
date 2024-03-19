@@ -1,22 +1,18 @@
 ## Remove a file
 
-You can remove a single file using `Amplify.Storage.remove` with the `key` and its associated access level:
+You can remove a single file using `Amplify.Storage.remove` with the `path`:
 
 ```dart
 import 'package:amplify_flutter/amplify_flutter.dart';
 
 Future<void> removeFile({
-  required String key,
-  required StorageAccessLevel accessLevel,
+  required StoragePath path,
 }) async {
   try {
     final result = await Amplify.Storage.remove(
-      key: key,
-      options: StorageRemoveOptions(
-        accessLevel: accessLevel,
-      ),
+      path: path,
     ).result;
-    safePrint('Removed file: ${result.removedItem.key}');
+    safePrint('Removed file: ${result.removedItem.path}');
   } on StorageException catch (e) {
     safePrint('Error deleting file: ${e.message}');
     rethrow;
@@ -26,20 +22,17 @@ Future<void> removeFile({
 
 ## Remove multiple files
 
-You can remove multiple files using `Amplify.Storage.removeMany` with the `keys`, the files to be removed in a batch should have the same access level:
+You can remove multiple files using `Amplify.Storage.removeMany` with the `paths`:
 
 ```dart
 import 'package:amplify_flutter/amplify_flutter.dart';
 
 Future<void> removePrivateFiles({
-  required List<String> keys,
+  required List<StoragePath> paths,
 }) async {
   try {
     final result = await Amplify.Storage.removeMany(
-      keys: keys,
-      options: const StorageRemoveManyOptions(
-        accessLevel: StorageAccessLevel.private,
-      ),
+      paths: paths,
     ).result;
     safePrint('Removed files: ${result.removedItems}');
   } on StorageException catch (e) {
